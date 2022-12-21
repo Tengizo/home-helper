@@ -1,0 +1,171 @@
+<header class="mt-4 mb-8 border-b-2">
+  <div class="flex flex-row">
+    <h1 class=" flex-grow text-3xl font-bold underline text-center">
+      Homes
+    </h1>
+    <span routerLink="scraps"
+          class="hover:cursor-pointer bg-blue-500 inline-block hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+   Scraps -->
+  </span>
+  </div>
+  <div class="flex flex-row justify-around mt-4 mb-4">
+    <div class="flex flex-row mr-2">
+      <mat-form-field class="example-form-field" appearance="fill">
+        <mat-label>Date filter</mat-label>
+        <mat-date-range-input
+          [rangePicker]="campaignOnePicker">
+          <input matStartDate placeholder="Start date" [(ngModel)]="dateFilter.dateFrom">
+          <input matEndDate placeholder="End date" [(ngModel)]="dateFilter.dateTo">
+        </mat-date-range-input>
+        <mat-datepicker-toggle matIconSuffix [for]="campaignOnePicker"></mat-datepicker-toggle>
+        <mat-date-range-picker #campaignOnePicker></mat-date-range-picker>
+      </mat-form-field>
+    </div>
+    <div class="flex-row mr-2">
+      <input type="number"
+             [(ngModel)]="filter.priceFrom"
+             class="bg-white-50 border border-gray-300 text-black text-sm rounded-lg
+                    focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-blue-50
+                    dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
+             placeholder="Price from">
+      <input type="number"
+             [(ngModel)]="filter.priceTo"
+             class="bg-white-50 border border-gray-300 text-black text-sm rounded-lg
+                    focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-blue-50
+                    dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
+             placeholder="price To">
+    </div>
+    <div class="flex flex-row  flex-grow mr-2">
+
+      <input type="text" id="url_to_scrap"
+             [(ngModel)]="filter.keyword"
+             class=" flex-grow bg-white-50 border border-gray-300 text-black text-sm rounded-lg
+                    focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-blue-50
+                    dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
+             placeholder="search text">
+      <button (click)="searchHomes()"
+              class="bg-red-400 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+        Search
+      </button>
+    </div>
+    <button (click)="updateFilter('REJECTED')"
+            [ngClass]="{'bg-red-900 border-4 border-black': filter.homeStatus === 'REJECTED'}"
+            class="bg-red-400 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+      Reject
+    </button>
+    <button (click)="updateFilter('FAVOURITE')"
+            [ngClass]="{'bg-green-900 border-4 border-black': filter.homeStatus === 'FAVOURITE'}"
+            class="bg-green-400 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+      Favorite
+    </button>
+    <button (click)="updateFilter('')"
+            [ngClass]="{'bg-blue-900 border-4 border-black': filter.homeStatus === ''}"
+            class="bg-blue-400 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+      ALL
+    </button>
+  </div>
+
+  <div class="flex flex-col">
+    <h2 class="text-xl font-bold underline text-center">Labels:</h2>
+    <div class="flex flex-row flex-wrap justify-around mt-4 mb-4">
+    <span *ngFor="let label of labels"
+          [ngClass]="{'bg-gray-400': filter.selectedLabels.includes(label)}"
+          (click)="selectLabel(label)"
+          class="inline-block border-gray-600 border-2 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2 hover:cursor-pointer hover:bg-gray-400"
+    >{{label}}</span>
+    </div>
+  </div>
+  <div class="flex flex-col">
+    <h2 class="text-xl font-bold underline text-center">Status:</h2>
+    <div class="flex flex-row flex-wrap justify-around mt-4 mb-4">
+    <span *ngFor="let status of statuses"
+          [ngClass]="{'bg-gray-400': filter.statuses.includes(status)}"
+          (click)="selectStatus(status)"
+          class="inline-block border-gray-600 border-2 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2 hover:cursor-pointer hover:bg-gray-400"
+    >{{status}}</span>
+    </div>
+  </div>
+  <div class="flex flex-col">
+    <h2 class="text-xl font-bold underline text-center">Sort by:</h2>
+    <div class="flex flex-row flex-wrap justify-around mt-4 mb-4">
+    <span *ngFor="let field of sorts"
+          [ngClass]="{'bg-gray-400': sort.sortField === field}"
+          (click)="selectSort(field)"
+          class="inline-block border-2 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2 hover:cursor-pointer hover:bg-gray-600"
+    >{{field}}
+      <span *ngIf="sort.sortDirection===1">↑</span>
+      <span *ngIf="sort.sortDirection===-1">↓</span>
+    </span>
+    </div>
+  </div>
+</header>
+<main class="flex flex-row flex-wrap justify-around ">
+  <div *ngFor="let home of items"
+       class="p-4 mb-10 max-w-sm rounded overflow-hidden shadow-md  shadow-gray-400 hover:shadow-xl hover:shadow-black">
+    <div class="border-b-2 border-solid border-black h-12 mb-2">
+      <h1 class="text-center text-m font-bold mb-4"><a target="_blank" [href]="home.url">{{home.title}}
+        - &nbsp; {{home.label}}</a></h1>
+    </div>
+    <div>
+      <p class="text-center text-xs">{{home.description}}</p>
+    </div>
+    <div class="px-6 pt-4 pb-2">
+      <span
+        class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">{{home.date|date:'medium'}}
+      </span>
+      <span
+        class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">status:{{home.homeStatus}}
+      </span>
+      <span
+        class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">{{home.buildingStatus}}
+      </span>
+      <span
+        class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">{{home.status}}
+    </span>
+      <span
+        class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">Pr:{{home.price}}
+        $
+      </span>
+      <span
+        class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">M2-Price: {{home.m2Price|number:'1.0-0'}}
+      </span>
+      <span
+        class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">Label: {{home.label}}
+      </span>
+      <span *ngIf="home.isVip"
+            class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">VIP</span>
+      <span
+        class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">Area: {{home.area}}
+      </span>
+      <span
+        class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">{{home.floor}}
+        /{{home.floorsTotal}}
+      </span>
+    </div>
+    <div class="flex flex-row justify-between">
+      <button (click)="updateStatus(home._id,'REJECTED')"
+              class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+        Reject
+      </button>
+      <button (click)="updateStatus(home._id,'FAVOURITE')"
+              class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+        Favorite
+      </button>
+    </div>
+  </div>
+
+</main>
+<footer>
+  <mat-paginator #paginator
+                 class="demo-paginator"
+                 (page)="handlePageEvent($event)"
+                 [length]="length"
+                 [pageSize]="pageSize"
+                 [disabled]="disabled"
+                 [showFirstLastButtons]="showFirstLastButtons"
+                 [pageSizeOptions]="showPageSizeOptions ? pageSizeOptions : []"
+                 [hidePageSize]="hidePageSize"
+                 [pageIndex]="pageIndex"
+                 aria-label="Select page">
+  </mat-paginator>
+</footer>

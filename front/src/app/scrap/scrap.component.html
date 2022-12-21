@@ -1,0 +1,98 @@
+<header class="mt-4 mb-8 border-b-2">
+  <div class="flex flex-row">
+    <span routerLink=""
+          class="hover:cursor-pointer bg-blue-500 inline-block hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+   <-- Home
+  </span>
+    <h1 class=" flex-grow text-3xl font-bold underline text-center">
+      Scraps
+    </h1>
+  </div>
+  <div class="flex flex-row justify-around m-8 p-4">
+    <div class="flex-grow mr-2">
+      <input type="text" id="url_to_scrap"
+             [(ngModel)]="scrap.url"
+             class="bg-white-50 border border-gray-300 text-black text-sm rounded-lg
+                    focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-blue-50
+                    dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
+             placeholder="Url" required>
+    </div>
+    <div class="mr-2">
+      <input type="number" id="startPage"
+             [(ngModel)]="scrap.startPage"
+             class="bg-white-50 border border-gray-300 text-black text-sm rounded-lg focus:ring-blue-500
+                    focus:border-blue-500 block w-full p-2.5 dark:bg-blue-50
+                    dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
+             placeholder="Start Page" required>
+    </div>
+    <div class="mr-2">
+      <input type="number" id="totalPages"
+             [(ngModel)]="scrap.totalPages"
+             class="bg-white-50 border border-gray-300 text-black text-sm rounded-lg focus:ring-blue-500
+                    focus:border-blue-500 block w-full p-2.5 dark:bg-blue-50 dark:border-gray-600
+                    dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
+
+             placeholder="Total Pages" required>
+    </div>
+    <div>
+      <button (click)="submitScrap()"
+              class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+        Submit
+      </button>
+    </div>
+  </div>
+</header>
+<main class="flex flex-row flex-wrap justify-around ">
+  <div *ngFor="let scrap of items"
+       [ngClass]="{'dark:bg-green-200  border-4 border-black': scrap.status === 'RUNNING'}"
+       class="p-4 mb-10 max-w-sm rounded overflow-hidden shadow-md  shadow-gray-400 hover:shadow-xl hover:shadow-black">
+    <div class="border-b-2 border-solid border-black h-12 mb-2">
+      <h1 class="text-center text-m font-bold mb-4"><a target="_blank" [href]="scrap.url">{{scrap.uuid}}</a></h1>
+    </div>
+    <div>
+      <p class="text-center text-xs">{{scrap.url}}</p>
+    </div>
+    <div class="px-6 pt-4 pb-2">
+      <span
+        class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">{{scrap.createDate|date:'medium'}}
+      </span>
+      <span
+        class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">Scrapped: {{scrap.scrappedPages}}
+        /{{scrap.totalPages}}
+      </span>
+      <span
+        class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">start page:{{scrap.startPage}}
+      </span>
+      <span
+        class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">Status: {{scrap.status}}
+      </span>
+      <span
+        class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">Total Pages:{{scrap.totalPages}}
+      </span>
+      <span
+        class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">total Properties:{{scrap.totalProperties}}
+      </span>
+      <div *ngIf="scrap.status==='RUNNING'">
+        <mat-progress-bar mode="determinate"
+                          color="blue"
+                          [value]="(scrap.scrappedPages/scrap.totalPages)*100"></mat-progress-bar>
+      </div>
+    </div>
+
+  </div>
+
+</main>
+<footer>
+  <mat-paginator #paginator
+                 class="demo-paginator"
+                 (page)="handlePageEvent($event)"
+                 [length]="length"
+                 [pageSize]="pageSize"
+                 [disabled]="disabled"
+                 [showFirstLastButtons]="showFirstLastButtons"
+                 [pageSizeOptions]="showPageSizeOptions ? pageSizeOptions : []"
+                 [hidePageSize]="hidePageSize"
+                 [pageIndex]="pageIndex"
+                 aria-label="Select page">
+  </mat-paginator>
+</footer>
