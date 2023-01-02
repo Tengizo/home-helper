@@ -1,6 +1,5 @@
-const utils = require('../utils');
-const selectors = require('../myHomeSelectors').propertySelectors;
-const Log = require('../../config/logger').logger('PropertyScrapper');
+const selectors = require('./myHomeSelectors').propertySelectors;
+const Log = require('../../../config/logger').logger('MHPropertyScrapper');
 
 
 module.exports.scrap = async function (home, browserPool) {
@@ -62,8 +61,34 @@ async function getData(page) {
     if (values[6].status === 'fulfilled') {
         result.badge = values[6].value?.trim();
     }
+    result.region = getRegion(result.title);
+    result.buildingStatus = getStatus(result.title);
+    result.m2Price = result.price && result.area ? result.price / result.area : 0;
+
 
     return result;
+}
+
+
+function getRegion(title) {
+    let start = title.indexOf('ბინა');
+    if (start === -1) {
+        return '';
+    } else {
+        start += 4;
+    }
+    return title.substring(start)?.trim();
+}
+
+function getStatus(title) {
+    if (title.includes('ახალი')) {
+        return 'NEW';
+    } else if (title.includes('ძველი')) {
+        return 'OLD';
+    } else if (title.includes('მშენებარე')) {
+        return 'CONSTRUCTION';
+    }
+    return 'UNKNOWN';
 }
 
 async function getPropertyStatus(details) {

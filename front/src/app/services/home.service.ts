@@ -22,4 +22,8 @@ export class HomeService {
   }
 
 
+  duplicates(id: string, filter: any): Observable<any> {
+    return this.http.get(BASE_URL + `/duplicates/${id}`, {params: filter});
+  }
+
 }

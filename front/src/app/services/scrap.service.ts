@@ -21,6 +21,10 @@ export class ScrapService {
     return this.http.get(`${BASE_ACC_URL}/get-status/${id}`);
   }
 
+  deleteScrap(id: string): Observable<any> {
+    return this.http.delete(`${BASE_ACC_URL}/delete/${id}`);
+  }
+
   search(filter: any): Observable<any> {
     return this.http.get(`${BASE_ACC_URL}/search`, {params: filter});
   }

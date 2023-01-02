@@ -2,6 +2,8 @@ const Log = require('../config/logger').logger('myHomeScrapper.js');
 const fs = require('fs');
 const path = require('path');
 const nodeUtils = require('util')
+const mongoose = require('mongoose');
+
 
 
 const {
@@ -38,15 +40,19 @@ async function filter(message) {
         Log.debug(`Found Not Matching home ${home.url}`);
     }
 }
+//
+// function filterByKeyword(keywords, home) {
+//     for (const keyword of keywords) {
+//         if (home.description.includes(keyword)) {
+//             return true;
+//         }
+//     }
+//     return false;
+// }
 
-function filterByKeyword(keywords, home) {
-    for (const keyword of keywords) {
-        if (home.description.includes(keyword)) {
-            return true;
-        }
-    }
-    return false;
-}
+// function isDuplicate(home) {
+//     HomeModel.find({originalId: home.originalId}).then((result) => {
+// }
 
 function getLabel(stats, home) {
     const percentage = home.m2Price / stats.averageM2Price;

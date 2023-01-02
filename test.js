@@ -1,66 +1,41 @@
+const mongoose = require('mongoose');
+require("dotenv").config();
+require('./config/database').connect();
+require('./model/home');
+require('./model/statistics');
+require('./model/scrap');
+const scrapper = require('./myHome/scrapper/scrapper');
 const BrowserPool = require('./browser/browserPool');
-const Log = require('./config/logger').logger('test.js');
-
-const browserPool = new BrowserPool({size: 5, headless: true, handleSIGINT: false});
+const EventEmitter = require('events');
 
 
-async function doWork(num) {
-    const browser = await browserPool.getBrowser();
-    Log.info(`browser ${num} aquired: ${browser.uuid}`);
-    setTimeout(() => {
-        browser.close();
-    }, 3000);
+const eventEmitter = new EventEmitter();
+const {
+    MY_HOME_URL, BATCH_SIZE
+} = process.env;
+
+const browserPool = new BrowserPool({size: BATCH_SIZE, headless: true, handleSIGINT: false});
+global.myHome = {
+    eventEmitter, browserPool, defaultUrlToScrap: MY_HOME_URL,
 }
+const mainScrapper = require('./myHome/mainScrapper');
 
-console.time('test');
-let promises = [];
-for (let i = 0; i < 20; i++) {
-    promises.push(doWork(i));
+
+const url = `https://ss.ge/ka/udzravi-qoneba/iyideba-3-otaxiani-bina-saburtaloze-6017807`;
+
+const Home = mongoose.model('Home');
+
+
+async function test() {
+    const home = await scrapper.scrapProperty({url}, browserPool)
+    await mainScrapper.toDb(home);
+
 }
-
-
-Promise.all([promises]).then(() => {
+//
+// test().then((values) => {
+//         console.log('done');
+//     }
+// );
+Home.deleteMany({source: 'SS'}).exec().then(() => {
     console.log('done');
 });
-console.timeEnd('test');
-//
-//
-// async function test() {
-//     console.time('test');
-//     let arr = [1, 2, 3, 4, 5, 6, 7, 8];
-//     let newArr = [];
-//     for (const n of arr) {
-//         if (await isEven(n)) {
-//             newArr.push(n);
-//         }
-//     }
-//     console.log(newArr);
-//     console.timeEnd('test');
-// }
-//
-//
-// async function test2() {
-//     console.time('test2');
-//     let arr = [1, 2, 3, 4, 5, 6, 7, 8];
-//     let newArr = [];
-//     let promises = arr.map(async (n) => {
-//         if (await isEven(n)) {
-//             newArr.push(n);
-//         }
-//     });
-//     await Promise.all(promises);
-//
-//     console.log(newArr);
-//     console.timeEnd('test2');
-// }
-//
-// function isEven(n) {
-//     return new Promise((resolve, reject) => {
-//         setTimeout(() => {
-//             resolve(n % 2 === 0)
-//         }, 1000);
-//     });
-// }
-//
-// test();
-// test2()

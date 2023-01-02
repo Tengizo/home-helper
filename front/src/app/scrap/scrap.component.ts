@@ -5,6 +5,7 @@ import {ScrapService} from '../services/scrap.service';
 
 type Scrap = {
   url: string;
+  cron: String;
   startPage: number;
   totalPages: number;
 }
@@ -18,6 +19,7 @@ export class ScrapComponent {
 
   scrap: Scrap = {
     url: '',
+    cron: '',
     startPage: 0,
     totalPages: 10
   }
@@ -49,17 +51,10 @@ export class ScrapComponent {
       this.length = data?.totalItems;
       this.pageIndex = data?.page;
       this.pageSize = data?.pageSize;
-      const containsRunning = this.items.some(item => item.status === 'RUNNING');
-      if (containsRunning) {
-        if (!this.interval) {
-          this.interval = setInterval(() => {
-            this.searchScraps();
-          }, 10000);
-        }
-      } else {
-        if (this.interval) {
-          clearInterval(this.interval);
-        }
+      if (!this.interval) {
+        this.interval = setInterval(() => {
+          this.searchScraps();
+        }, 3000);
       }
     });
   }
@@ -84,8 +79,11 @@ export class ScrapComponent {
 
   }
 
-  getProgress(scrap: any) {
-    scrap.totalPages/100
-    return undefined;
+
+  deleteScrap(scrap: any) {
+    this.scrapService.deleteScrap(scrap.uuid).subscribe((data) => {
+      this.openSnackBar(`Scrap Deleted: ${data.uuid}`, 'Close');
+      this.searchScraps();
+    });
   }
 }

@@ -10,7 +10,12 @@ type Filter = {
   selectedLabels: number[];
   priceFrom?: Number;
   priceTo?: Number;
+  m2PriceFrom?: Number;
+  m2PriceTo?: Number;
+  m2From?: Number;
+  m2To?: Number;
   statuses: string[];
+  sources: string[];
 };
 
 @Component({
@@ -23,9 +28,12 @@ export class HomeComponent {
   filter: Filter = {
     keyword: '',
     homeStatus: '',
+
     statuses: [],
-    selectedLabels: []
+    selectedLabels: [],
+    sources: []
   };
+  badge = false;
   dateFilter: { dateFrom?: Date, dateTo?: Date } = {};
   sort = {sortField: 'date', sortDirection: -1};
   length = 50;
@@ -41,6 +49,7 @@ export class HomeComponent {
   items: any[] = [];
   labels: number[] = [];
   sorts: string[] = ['date', 'label', 'm2Price'];
+  sources: string[] = ['SS', 'MYHOME']
   statuses: string[] = [
     'ახალი გარემონტებული',
     'მიმდინარე რემონტი',
@@ -50,6 +59,8 @@ export class HomeComponent {
     'შავი კარკასი',
     'მწვანე კარკასი'
   ];
+  showDuplicate: boolean = false;
+  duplicatesOf: any;
 
   constructor(private homeService: HomeService, private _snackBar: MatSnackBar) {
     this.fillLabels();
@@ -66,25 +77,33 @@ export class HomeComponent {
     if (this.dateFilter.dateTo) {
       dateFilter.dateTo = this.dateFilter.dateTo.getTime();
     }
-    const fltr = {
+    let fltr = {
       page: this.pageIndex,
       pageSize: this.pageSize,
       ...this.filter,
       ...dateFilter,
       ...this.sort
     };
-    if (!fltr.priceFrom) {
-      delete fltr.priceFrom;
+    if (this.badge) {
+      fltr.badge = 'მესაკუთრე';
     }
-    if (!fltr.priceTo) {
-      delete fltr.priceTo;
-    }
+    fltr = this.deleteIfNotExists(['priceFrom', 'priceTo', 'm2PriceFrom', 'm2PriceTo', 'm2From', 'm2To'], fltr);
     this.homeService.search(fltr).subscribe((data) => {
       this.items = data?.content
       this.length = data?.totalItems;
       this.pageIndex = data?.page;
       this.pageSize = data?.pageSize;
+      this.showDuplicate = false;
     });
+  }
+
+  private deleteIfNotExists(strings: string[], fltr: any) {
+    strings.forEach(s => {
+      if (!fltr[s]) {
+        delete fltr[s];
+      }
+    });
+    return fltr;
   }
 
   updateStatus(id: any, status: any) {
@@ -99,7 +118,11 @@ export class HomeComponent {
     this.length = e.length;
     this.pageSize = e.pageSize;
     this.pageIndex = e.pageIndex;
-    this.searchHomes();
+    if (this.showDuplicate) {
+      this.showDuplicates(this.duplicatesOf);
+    } else {
+      this.searchHomes();
+    }
   }
 
 
@@ -142,6 +165,37 @@ export class HomeComponent {
       this.filter.statuses?.push(status);
     }
     console.log(`this.filter.statuses`, this.filter.statuses);
+    this.searchHomes();
+  }
+  selectSource(source: string) {
+    if (this.filter?.sources?.includes(source)) {
+      this.filter.sources = this.filter.sources.filter(l => l !== source);
+    } else {
+      this.filter.sources?.push(source);
+    }
+    console.log(`this.filter.sources`, this.filter.sources);
+    this.searchHomes();
+  }
+
+  showDuplicates(home: any) {
+    this.duplicatesOf = home;
+    let fltr = {
+      page: 0,
+      pageSize: this.pageSize,
+      ...this.sort
+    };
+    this.homeService.duplicates(home._id, fltr).subscribe((data) => {
+      home.main = true;
+      this.items = [home, ...data?.content]
+      this.length = data?.totalItems;
+      this.pageIndex = data?.page;
+      this.pageSize = data?.pageSize;
+      this.showDuplicate = true;
+    });
+  }
+
+  hidDuplicates() {
+    this.showDuplicate = false;
     this.searchHomes();
   }
 }
