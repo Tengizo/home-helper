@@ -85,7 +85,8 @@ function getRegion(title) {
 }
 
 function standartizeStatus(status) {
-    return STATUS_MAP[status.trim()];
+
+    return STATUS_MAP[status?.replace(';', '')?.trim()];
 }
 
 async function getPropertyStatus(details) {
@@ -98,7 +99,7 @@ async function getPropertyStatus(details) {
         if (keys[i] === 'სტატუსი') {
             result.buildingStatus = utils.getBuildingStatus(amenitities[i]?.replace(';', '')?.trim());
         } else if (keys[i] === 'მდგომარეობა') {
-            result.status = standartizeStatus(amenitities[i]?.replace(';', '')?.trim());
+            result.status = standartizeStatus(amenitities[i]);
         }
     }
     return result;

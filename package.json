@@ -8,7 +8,8 @@
     "express": "node ./MyHomeViewer/index.js",
     "front": "cd front && npm start",
     "dev": "concurrently \"npm run scrapper\" \"npm run express\" \"npm run front\"",
-    "dev-back": "concurrently \"npm run scrapper\" \"npm run express\" ",
+    "dev-back": "concurrently \"npm run scrapper\" \"npm run express\"",
+    "dev-ui": "concurrently \"npm run front\" \"npm run express\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",

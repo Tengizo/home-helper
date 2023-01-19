@@ -9,6 +9,7 @@ app.use(cors());
 
 require('./routes/propertyRoutes')(app);
 require('./routes/scrapperRoutes')(app);
+require('./routes/browserPoolRoutes')(app);
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {

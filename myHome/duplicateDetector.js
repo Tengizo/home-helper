@@ -53,19 +53,21 @@ const findDuplicates = async (home) => {
     let mainHome = home;
     if (result.length > 0) {
         for (const resultElement of result) {
-            // const titleMatch = checkText(home.title, resultElement.title);
-            // const descriptionMatch = checkText(home.description, resultElement.description);
-            // if (titleMatch > 80 || descriptionMatch > 80) {
-            if (isOwner(resultElement) && resultElement.duplicates?.length > 0) {
-                mainHome = resultElement;
-                mainHome.alreadyChosen = true;
-            } else if (!mainHome.alreadyChosen && (isOwner(resultElement) || resultElement.duplicates?.length > 0)) {
-                mainHome = resultElement;
-            } else {
-                duplicates.push(resultElement._id);
-            }
+            if (Math.abs(home.date.getTime() - resultElement.date.getTime()) < 1000 * 60 * 60 * 24 * 20) {
 
-            // }
+                // const titleMatch = checkText(home.title, resultElement.title);
+                // const descriptionMatch = checkText(home.description, resultElement.description);
+                // if (titleMatch > 80 || descriptionMatch > 80) {
+                if (isOwner(resultElement) && resultElement.duplicates?.length > 0) {
+                    mainHome = resultElement;
+                    mainHome.alreadyChosen = true;
+                } else if (!mainHome.alreadyChosen && (isOwner(resultElement) || resultElement.duplicates?.length > 0)) {
+                    mainHome = resultElement;
+                } else {
+                    duplicates.push(resultElement._id);
+                }
+
+            }
         }
     }
 
@@ -112,26 +114,26 @@ const getDuplicateFilter = (home) => {
     return filter;
 }
 
-function checkText(txt, txt2) {
-    if (!txt) {
-        txt = '';
-    }
-    if (!txt2) {
-        txt2 = '';
-    }
-    const words = txt.replace(/[&\/\\#,+()$~%.'":*?<>{}]/g, '').split(' ');
-    let regex = "";
-    for (const word of words) {
-        if (word.length > 0) {
-            regex += word + '|';
-        }
-    }
-    regex = regex.slice(0, -1);
-    regex = `(?:${regex})`;
-    const regexObj = new RegExp(regex, 'gi');
-    let matchLength = txt2 ? txt2?.match(regexObj)?.length : 0;
-    return matchLength * 100 / words.length;
-
-}
+// function checkText(txt, txt2) {
+//     if (!txt) {
+//         txt = '';
+//     }
+//     if (!txt2) {
+//         txt2 = '';
+//     }
+//     const words = txt.replace(/[&\/\\#,+()$~%.'":*?<>{}]/g, '').split(' ');
+//     let regex = "";
+//     for (const word of words) {
+//         if (word.length > 0) {
+//             regex += word + '|';
+//         }
+//     }
+//     regex = regex.slice(0, -1);
+//     regex = `(?:${regex})`;
+//     const regexObj = new RegExp(regex, 'gi');
+//     let matchLength = txt2 ? txt2?.match(regexObj)?.length : 0;
+//     return matchLength * 100 / words.length;
+//
+// }
 
 module.exports = {getDuplicateFilter, findDuplicates, fixAllOwner, fixAllAgent, fixAll};

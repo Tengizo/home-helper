@@ -18,7 +18,7 @@ module.exports.scrap = async function (url, browserPool) {
         for (const item of content) {
             promises.push(scrapCard(item, url));
         }
-        const values = await Promise.all(promises);
+        const values = (await Promise.all(promises)).filter((x) => x !== null);
         result.push(...values);
 
         return result;
@@ -31,21 +31,21 @@ module.exports.scrap = async function (url, browserPool) {
 };
 
 async function scrapCard(item, searchUrl) {
-    const pr1 = item.$eval(listSelectors.linkSelector, (el) =>
-        el.getAttribute("href")
-    );
-    const pr2 = item.$eval(listSelectors.dateSelector, (el) => el?.innerText);
-    const pr3 = item.$eval(listSelectors.idSelector, (el) => el?.innerText);
-    const pr4 = item.$(listSelectors.isVip);
-    return Promise.all([pr1, pr2, pr3, pr4]).then((values) => {
-        const id = values[2]?.replace("ID", "")?.trim();
-        const date = utils.toDateMyHome(values[1]);
+    try {
+        const link = await item.$eval(listSelectors.linkSelector, (el) => el.getAttribute("href"));
+        const dateStr = await item.$eval(listSelectors.dateSelector, (el) => el?.innerText);
+        const idStr = await item.$eval(listSelectors.idSelector, (el) => el?.innerText);
+        const isVip = await item.$(listSelectors.isVip);
+        const id = idStr?.replace("ID", "")?.trim();
+        const date = utils.toDateMyHome(dateStr);
         return {
             originalId: id,
             date,
-            url: values[0],
+            url: link,
             searchUrl,
-            isVip: values[3] !== null,
+            isVip: isVip !== null,
         };
-    });
+    } catch (e) {
+        return null;
+    }
 }

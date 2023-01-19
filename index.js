@@ -23,6 +23,7 @@ global.myHome = {
 const myHomeScrapper = require('./myHome/mainScrapper');
 const Queue = require('./browser/queue');
 const Scrap = mongoose.model('Scrap');
+require('./MyHomeViewer/express-app/expressApp')
 const scrapRequestQueue = new Queue();
 let status = 0;
 let firstTime = true;

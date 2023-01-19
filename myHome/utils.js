@@ -1,6 +1,6 @@
 const {URL} = require('url');
 const MONTHS = {
-    'დეკ.': 11, 'ნოემ.': 10,
+    'იანვ.': 0, 'დეკ.': 11, 'ნოემ.': 10,
 }
 const SS_HOST = 'ss.ge';
 const MYHOME_HOST = 'myhome.ge';
@@ -32,7 +32,7 @@ module.exports.getBuildingStatus = (status) => {
 };
 
 module.exports.getSource = (url) => {
-    const host = new URL(url).host;
+    const host = new URL(url).host.trim().replace('www.', '');
     switch (host) {
         case SS_HOST:
             return 'SS';

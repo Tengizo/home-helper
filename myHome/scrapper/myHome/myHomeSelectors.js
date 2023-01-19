@@ -1,6 +1,6 @@
 module.exports = {
     listSelectors: {
-        cardSelector: `div[class='statement-card']`,
+        cardSelector: `.statement-card`,
         linkSelector: ` a[class='card-container']`,
         idSelector: `div[class='list-view-id-container justify-content-center'] div[class='content'] span[class='d-block']`,
         dateSelector: `div[class='card-body'] div[class='statement-date']`,
@@ -8,7 +8,7 @@ module.exports = {
         isVip: `div.vip-label`,
     },
     propertySelectors: {
-        detailPage: `div[class='detail-page']`,
+        detailPage: `.detail-page`,
         statementHeader: `div[class='statement-header']`,
         priceBlock: `aside[class='price-block'] div[class='price-box']`,
         mainFeatures: `div[class='main-features row no-gutters'] span[class='d-block']`,

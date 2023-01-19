@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const {Schema} = mongoose;
 
 const HomeSchema = new Schema({
-    originalId: {type: String},
+    originalId: String,
     url: {type: String, unique: true},
     searchUrl: {type: String},
     date: Date,

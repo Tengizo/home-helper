@@ -136,11 +136,12 @@ async function checkExisting(result, source) {
         return home;
     }));
     for (const existingHome of existingHomes) {
-        existingHome.label = getLabel(existingHome.stats, existingHome);
-        if (!existingHome.label) {
+        if (existingHome.stats && existingHome.stats?.propertiesTotal > 5 && existingHome.price > 0) {
+            existingHome.label = getLabel(existingHome.stats, existingHome);
             updateHomeLabel(existingHome).then(() => {
-                Log.info(`Updated home label ${existingHome.url}`)
             });
+        } else {
+            Log.info(`Stats not found for ${existingHome.url}`)
         }
     }
     if (existingHomes.length > 0) {

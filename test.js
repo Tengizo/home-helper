@@ -1,41 +1,63 @@
-const mongoose = require('mongoose');
-require("dotenv").config();
-require('./config/database').connect();
-require('./model/home');
-require('./model/statistics');
-require('./model/scrap');
-const scrapper = require('./myHome/scrapper/scrapper');
-const BrowserPool = require('./browser/browserPool');
-const EventEmitter = require('events');
+const puppeteer = require('puppeteer');
 
+async function scrapeData() {
+    // Launch a headless Chrome browser
+    const browser = await puppeteer.launch();
 
-const eventEmitter = new EventEmitter();
-const {
-    MY_HOME_URL, BATCH_SIZE
-} = process.env;
+    // Open a new page in the browser
+    const page = await browser.newPage();
 
-const browserPool = new BrowserPool({size: BATCH_SIZE, headless: true, handleSIGINT: false});
-global.myHome = {
-    eventEmitter, browserPool, defaultUrlToScrap: MY_HOME_URL,
+    // Navigate to the website
+    await page.goto("https://www.myhome.ge/en/search?search_text=tbilisi");
+
+    // Wait for the page to load
+    await page.waitForSelector(".card-title");
+
+    // Extract the data from the page
+    const data = await page.evaluate(() => {
+        // Find all the elements with the class "card-item"
+        const elements = document.querySelectorAll(".card-item");
+
+        // Extract the data from each element
+        return Array.from(elements).map(element => {
+            // Extract the date from the element
+            const date = element.querySelector(".item-date").innerText;
+
+            // Extract the ID from the element
+            const id = element.querySelector(".item-id").innerText;
+
+            // Extract the area from the element
+            const area = element.querySelector(".item-area").innerText;
+
+            // Extract the price from the element
+            const price = element.querySelector(".item-price").innerText;
+
+            // Extract the number of total floors in the building from the element
+            const totalFloors = element.querySelector(".item-floors").innerText;
+
+            // Extract the floor of the apartment from the element
+            const floor = element.querySelector(".item-apartment-floor").innerText;
+
+            // Extract the number of rooms from the element
+            const rooms = element.querySelector(".item-rooms").innerText;
+
+            return {
+                date: date,
+                id: id,
+                area: area,
+                price: price,
+                totalFloors: totalFloors,
+                floor: floor,
+                rooms: rooms
+            };
+        });
+    });
+
+    // Print the data
+    console.log(data);
+
+    // Close the browser
+    await browser.close();
 }
-const mainScrapper = require('./myHome/mainScrapper');
 
-
-const url = `https://ss.ge/ka/udzravi-qoneba/iyideba-3-otaxiani-bina-saburtaloze-6017807`;
-
-const Home = mongoose.model('Home');
-
-
-async function test() {
-    const home = await scrapper.scrapProperty({url}, browserPool)
-    await mainScrapper.toDb(home);
-
-}
-//
-// test().then((values) => {
-//         console.log('done');
-//     }
-// );
-Home.deleteMany({source: 'SS'}).exec().then(() => {
-    console.log('done');
-});
+scrapeData();
